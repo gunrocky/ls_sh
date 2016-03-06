@@ -18,9 +18,14 @@
  */
 
 #include <cstdlib>
+#include <memory>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #include <iostream>
+#include <bitset>
 
-using namespace std;
+//using namespace std;
 
 /*
  * 
@@ -29,8 +34,33 @@ int main(int argc, char** argv) {
 
     if (argc < 2 || argc > 2)
     {
-        cout << "usage: " << argv[0] << " <directory path>";
+        std::cout << "usage: " << argv[0] << " <directory path>";
+        return 1;
     }
+    
+    std::unique_ptr<DIR, void (*)(DIR *)> udir(opendir(argv[1]),
+            [] (DIR *udir)
+            {
+                closedir(udir);
+            });
+    
+    struct dirent *entry = NULL;
+    struct stat fileStat {};
+    int ret = 0;
+    errno = 0;
+    while ((entry = readdir(udir.get())) != NULL)
+    {
+        // TODO: correct output of file type and permissions
+        ret = stat(entry->d_name, &fileStat);
+        if (ret)
+        {
+            std::cout << "error to get stat of " << entry->d_name << std::endl;
+            continue;
+        }
+        std::bitset<(sizeof(__mode_t) * 8)> b(fileStat.st_mode);
+        std::cout << b.to_string() << "  " << entry->d_name << std::endl;
+    }
+    
     return 0;
 }
 
