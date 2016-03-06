@@ -17,6 +17,8 @@
         </gdb_signals>
         <gdb_options>
           <DebugOptions>
+            <option name="debug_command"
+                    value="/home/gunrock/TasksLinux/ls_sh/dist/Debug/GNU-Linux/ls_sh ${PROJECT_DIR}"/>
           </DebugOptions>
         </gdb_options>
         <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
