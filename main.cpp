@@ -29,6 +29,9 @@
 // count of access bits of file
 static const unsigned short g_count_accessbits = 9;
 
+// array of possible access rights
+static const char g_access_rights[] = "xwr";
+
 /*
  * 
  */
@@ -71,6 +74,9 @@ int main(int argc, char** argv) {
     }
     char filetype = 0;
     std::string fullPath;
+    std::string accessbits;
+    accessbits.resize(g_count_accessbits + 1, '\0');
+    unsigned short bit = 0;
     
     int ret = 0;
     errno = 0;
@@ -122,7 +128,19 @@ int main(int argc, char** argv) {
                 break;
         }
         std::bitset<g_count_accessbits> b(fileStat.st_mode);
-        std::cout << filetype << ' ' << b.to_string() << "  " << entry->d_name << std::endl;
+        for (unsigned short i = 0; i < g_count_accessbits; ++i)
+        {
+            bit = i % 3;
+            if (b[i])
+            {
+                accessbits[g_count_accessbits - i] = g_access_rights[bit];
+            }
+            else
+            {
+                accessbits[g_count_accessbits - i] = '-';
+            }
+        }
+        std::cout << filetype << accessbits << "  " << entry->d_name << std::endl;
     }
     
     return 0;
