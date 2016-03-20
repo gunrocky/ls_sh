@@ -40,7 +40,23 @@ int main(int argc, char** argv) {
         return 1;
     }
     
-    std::unique_ptr<DIR, void (*)(DIR *)> udir(opendir(argv[1]),
+    DIR *dirstream = opendir(argv[1]);
+    if (dirstream == NULL)
+    {
+        int error = errno;
+        std::cerr << "\"" << argv[1];
+        switch (error)
+        {
+            case ENOENT:
+                std::cerr << "\" directory does not exist or an empty string\n";
+                break;
+            case ENOTDIR:
+                std::cerr << "\" is not a directory\n";
+                break;
+        }
+        return error;
+    }
+    std::unique_ptr<DIR, void (*)(DIR *)> udir(dirstream,
             [] (DIR *udir)
             {
                 closedir(udir);
